@@ -111,6 +111,13 @@ public class UserController {
         return ResponseEntity.ok(msg);
     }
     
+    @GetMapping("/search")
+    @AuthRequired
+    public ResponseEntity<List<ProductGetResponseDTO>> getProductBySearch(@RequestParam("product_Id") String productId,@RequestParam("product_Name") String productName,@RequestParam("product_Category") String productCategory){
+    	List<ProductGetResponseDTO> productGetResponseDTO = userImpl.getProductBySearch(productId, productName,productCategory);
+        return ResponseEntity.ok(productGetResponseDTO);
+    }
+    
     @GetMapping("/search/name")
     @AuthRequired
     public ResponseEntity<List<ProductGetResponseDTO>> getProductByName(@RequestParam("product_Name") String productName){
@@ -140,14 +147,14 @@ public class UserController {
         return ResponseEntity.ok(productGetResponseDTO);
     }
     
-    @GetMapping("/sort/byprice/high-to-low")
+    @PostMapping("/sort/byprice/high-to-low")
     @AuthRequired
     public ResponseEntity<List<ProductGetResponseDTO>> getProductByPriceHighToLow(@RequestBody List<ProductGetResponseDTO> productList){
     	List<ProductGetResponseDTO> productGetResponseDTO = userImpl.getProductByPriceHighToLow(productList);
         return ResponseEntity.ok(productGetResponseDTO);
     }
 
-    @GetMapping("/sort/byprice/low-to-high")
+    @PostMapping("/sort/byprice/low-to-high")
     @AuthRequired
     public ResponseEntity<List<ProductGetResponseDTO>> getProductByPriceLowToHigh(@RequestBody List<ProductGetResponseDTO> productList){
     	List<ProductGetResponseDTO> productGetResponseDTO = userImpl.getProductByPriceLowToHigh(productList);

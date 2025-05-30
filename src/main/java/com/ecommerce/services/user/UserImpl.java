@@ -158,5 +158,26 @@ public class UserImpl {
 		return productService.getProductByProductId(productId);
 	}
 
+	public List<ProductGetResponseDTO> getProductBySearch(String productId, String productName, String productCategory) {
+	    if (productId.equals("null") && productName.equals("null") && productCategory.equals("null")) {
+	        throw new InvalidInputException("No input given");
+	    } else if (!productId.equals("null") && productName.equals("null") && productCategory.equals("null")) {
+	        return productService.getProductByProductId(productId);
+	    } else if (productId.equals("null") && !productName.equals("null") && productCategory.equals("null")) {
+	        return productService.getProductByName(productName);
+	    } else if (productId.equals("null") && productName.equals("null") && !productCategory.equals("null")) {
+	        return productService.getProductByCategory(productCategory);
+	    } else if (productId.equals("null") && !productName.equals("null") && !productCategory.equals("null")) {
+	        return productService.getProductByNameAndCategory(productName, productCategory);
+	    } else if (!productId.equals("null") && !productName.equals("null") && productCategory.equals("null")) {
+	        return productService.getProductByIdAndName(productId, productName);
+	    } else if (!productId.equals("null") && productName.equals("null") && !productCategory.equals("null")) {
+	        return productService.getProductByIdAndCategory(productId, productCategory);
+	    } else {
+	        return productService.getProductByIdNameAndCategory(productId, productName, productCategory);
+	    }
+	}
+
+
 }
 

@@ -317,6 +317,79 @@ public class ProductService {
 	    }
 	    throw new ResourceNotFoundException("Failed to find products with specified name.");
 	}
+	
+	public List<ProductGetResponseDTO> getProductByIdAndName(String productId, String productName) {
+	    Query query = new Query(new Criteria().andOperator(
+	            Criteria.where("productId").regex(productId),
+	            Criteria.where("productName").regex(".*" + productName + ".*", "i")
+	    ));
+
+	    List<Product> products = mongoTemplate.find(query, Product.class);
+	    if (!products.isEmpty()) {
+	        return products.stream()
+	                .map(product -> new ProductGetResponseDTO(
+	                        product.getCategory(),
+	                        product.getProductId(),
+	                        product.getProductName(),
+	                        product.getProductDescription(),
+	                        product.getProductPrice(),
+	                        product.getImageUrls(),
+	                        reviewService.getProductReviews(product.getProductId())
+	                ))
+	                .collect(Collectors.toList());
+	    }
+
+	    throw new ResourceNotFoundException("No products found with specified ID and name.");
+	}
+	public List<ProductGetResponseDTO> getProductByIdAndCategory(String productId, String category) {
+	    Query query = new Query(new Criteria().andOperator(
+	            Criteria.where("productId").regex(productId),
+	            Criteria.where("category").regex(".*" + category + ".*", "i")
+	    ));
+
+	    List<Product> products = mongoTemplate.find(query, Product.class);
+	    if (!products.isEmpty()) {
+	        return products.stream()
+	                .map(product -> new ProductGetResponseDTO(
+	                        product.getCategory(),
+	                        product.getProductId(),
+	                        product.getProductName(),
+	                        product.getProductDescription(),
+	                        product.getProductPrice(),
+	                        product.getImageUrls(),
+	                        reviewService.getProductReviews(product.getProductId())
+	                ))
+	                .collect(Collectors.toList());
+	    }
+
+	    throw new ResourceNotFoundException("No products found with specified ID and category.");
+	}
+
+	public List<ProductGetResponseDTO> getProductByIdNameAndCategory(String productId, String productName, String productCategory) {
+	    Query query = new Query(new Criteria().andOperator(
+	            Criteria.where("productId").regex(productId),
+	            Criteria.where("productName").regex(".*" + productName + ".*", "i"),
+	            Criteria.where("category").regex(".*" + productCategory + ".*", "i")
+	    ));
+
+	    List<Product> products = mongoTemplate.find(query, Product.class);
+	    if (!products.isEmpty()) {
+	        return products.stream()
+	                .map(product -> new ProductGetResponseDTO(
+	                        product.getCategory(),
+	                        product.getProductId(),
+	                        product.getProductName(),
+	                        product.getProductDescription(),
+	                        product.getProductPrice(),
+	                        product.getImageUrls(),
+	                        reviewService.getProductReviews(product.getProductId())
+	                ))
+	                .collect(Collectors.toList());
+	    }
+
+	    throw new ResourceNotFoundException("No products found with specified ID, name, and category.");
+	}
+
 
 
 
