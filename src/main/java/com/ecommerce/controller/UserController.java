@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ecommerce.dto.CartItemAddRequestDTO;
 import com.ecommerce.dto.CartItemUpdateRequestDTO;
 import com.ecommerce.dto.OrderGetResponseDTO;
+import com.ecommerce.dto.PaymentOrderResponseDTO;
 import com.ecommerce.dto.ProductGetResponseDTO;
 import com.ecommerce.dto.ReviewRequestDTO;
 import com.ecommerce.dto.ReviewUpdateRequestDTO;
@@ -89,11 +90,19 @@ public class UserController {
         checkoutResponse.put("message", message);
         return ResponseEntity.status(status).body(checkoutResponse);
     }
+    
+    @GetMapping("/checkpayment")
+    @AuthRequired
+    public ResponseEntity<PaymentOrderResponseDTO> checkPayment(@RequestParam("payment_Id") String paymentId){
+    	System.out.println(paymentId);
+    	PaymentOrderResponseDTO paymentOrderResponseDTO=userImpl.checkPayment(paymentId);
+    	return ResponseEntity.ok(paymentOrderResponseDTO);
+    }
         
     @GetMapping("/orders")
     @AuthRequired
-    public ResponseEntity<OrderGetResponseDTO> getAllOrders(){
-        OrderGetResponseDTO orderGetResponseDTO = userImpl.getAllOrders();
+    public ResponseEntity<OrderGetResponseDTO> getAllOrders(@RequestParam("user_Id") String userId){
+        OrderGetResponseDTO orderGetResponseDTO = userImpl.getAllOrders(userId);
         return ResponseEntity.ok(orderGetResponseDTO);
     }
     

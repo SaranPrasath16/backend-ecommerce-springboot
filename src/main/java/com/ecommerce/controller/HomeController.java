@@ -67,11 +67,23 @@ public class HomeController {
     public ResponseEntity<String> loginUser(@RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response){
         LoginResponseDTO loginResponseDTO = userRegisterLoginService.validateUser(loginRequestDTO);
         User user=loginResponseDTO.getUser();
+        String role="USER";
         response.setHeader("Authorization", "Bearer " + loginResponseDTO.getToken());
         response.setHeader("userName", user.getUserName());
         response.setHeader("userEmail", user.getEmail());
         response.setHeader("userAddress", user.getAddress());
         response.setHeader("userMobile", String.valueOf(user.getMobile()));
+        response.setHeader("userId", user.getUserId());
+        if(user.isMainAdmin()) {
+        	role="SUPER_ADMIN";
+        }
+        else if(user.isProductAdmin()) {
+        	role="PRODUCT_ADMIN";
+        }
+        else if(user.isOrdersAdmin()) {
+        	role="ORDER_ADMIN";
+        }
+        response.setHeader("role", role);
         return ResponseEntity.ok(loginResponseDTO.getMessage());
     }
    

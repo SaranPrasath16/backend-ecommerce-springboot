@@ -11,6 +11,7 @@ import com.ecommerce.dto.CartItemAddRequestDTO;
 import com.ecommerce.dto.CartItemUpdateRequestDTO;
 import com.ecommerce.dto.OrderAddResponseDTO;
 import com.ecommerce.dto.OrderGetResponseDTO;
+import com.ecommerce.dto.PaymentOrderResponseDTO;
 import com.ecommerce.dto.ProductGetResponseDTO;
 import com.ecommerce.dto.ReviewRequestDTO;
 import com.ecommerce.dto.ReviewUpdateRequestDTO;
@@ -81,8 +82,8 @@ public class UserImpl {
 	public OrderAddResponseDTO placeOrder(String payload, String razorpaySignature) {
 		return orderService.placeOrder(payload,razorpaySignature);
 	}
-	public OrderGetResponseDTO getAllOrders() {
-        return orderService.getAllOrders();
+	public OrderGetResponseDTO getAllOrders(String userId) {
+        return orderService.getAllOrders(userId);
 	}
 	public Orders getSpecificOrder(String orderId) {
         return orderService.getSpecificOrder(orderId);
@@ -176,6 +177,10 @@ public class UserImpl {
 	    } else {
 	        return productService.getProductByIdNameAndCategory(productId, productName, productCategory);
 	    }
+	}
+
+	public PaymentOrderResponseDTO checkPayment(String paymentId) {
+		return orderService.checkPayment(paymentId);
 	}
 
 

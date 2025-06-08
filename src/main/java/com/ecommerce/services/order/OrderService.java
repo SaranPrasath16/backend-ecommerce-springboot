@@ -18,6 +18,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import com.ecommerce.dto.OrderAddResponseDTO;
 import com.ecommerce.dto.OrderGetResponseDTO;
+import com.ecommerce.dto.PaymentOrderResponseDTO;
 import com.ecommerce.exceptionhandler.EntityDeletionException;
 import com.ecommerce.exceptionhandler.EntityUpdationException;
 import com.ecommerce.exceptionhandler.InvalidInputException;
@@ -104,10 +105,14 @@ public class OrderService {
 	    if (itemsToProcess.isEmpty()) {
 	        throw new ResourceNotFoundException("All items are out of stock. No payment link generated.");
 	    }
+
+	    Map<String, Object> response = new HashMap<>();
+
 	    try {
-	        Map<String, String> paymentLinkData = razorpayService.generatePaymentLink(user.getUserName(), user.getEmail(),finalAmount);
+	        Map<String, String> paymentLinkData = razorpayService.generatePaymentLink(user.getUserName(), user.getEmail(), finalAmount);
 	        String paymentLinkUrl = paymentLinkData.get("short_url");
-	        String razorpayInvoiceId =paymentLinkData.get("invoice_id");
+	        String razorpayInvoiceId = paymentLinkData.get("invoice_id");
+
 	        Payment payment = new Payment(
 	                cartId,
 	                null,
@@ -118,22 +123,27 @@ public class OrderService {
 	                "INITIATED",
 	                paymentDateTime
 	        );
-	        paymentRepo.save(payment);
+
+	        Payment savedPayment = paymentRepo.save(payment);
+
 	        emailService.sendPaymentLink(user.getEmail(), user.getUserName(), paymentLinkUrl);
+
+	        response.put("outOfStockItems", outOfStock);
+	        response.put("message", "Payment link sent to your registered email. Complete the payment to confirm the order.");
+	        response.put("paymentLinkUrl", paymentLinkUrl);
+	        response.put("paymentId", savedPayment.getPaymentId());
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        throw new RuntimeException("Payment link generation failed.");
 	    }
+
 	    cartService.deleteSelectedCartItems(cartId, outOfStockItems);
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("outOfStockItems", outOfStock);
-	    response.put("message", "Payment link sent to your registered email. Complete the payment to confirm the order.");
 
 	    return response;
 	}
 
-	public OrderGetResponseDTO getAllOrders() {
-        String userId = JwtAspect.getCurrentUserId();
+
+	public OrderGetResponseDTO getAllOrders(String userId) {
         if (userId.isEmpty() || userId ==null) {
             throw new ResourceNotFoundException("User ID not found in JWT token.");
         }
@@ -310,6 +320,26 @@ public class OrderService {
         }
         throw new EntityUpdationException("Failed to update order");
 	}
+
+	public PaymentOrderResponseDTO checkPayment(String paymentId) {
+	    Payment payment = paymentRepo.findByPaymentId(paymentId);
+
+	    if (payment == null) {
+	    	throw new ResourceNotFoundException("No Payment is found for the paymentId: "+paymentId);
+	    }
+
+	    String status = payment.getPaymentStatus();
+	    if ("failed".equalsIgnoreCase(status)) {
+	        return new PaymentOrderResponseDTO(payment, null);
+	    }
+	    else if ("captured".equalsIgnoreCase(status) || "authorized".equalsIgnoreCase(status)) {
+	        Orders order = orderRepo.findByPaymentId(paymentId);
+	        return new PaymentOrderResponseDTO(payment, order);
+	    }
+
+	    return null;
+	}
+
 
 
 

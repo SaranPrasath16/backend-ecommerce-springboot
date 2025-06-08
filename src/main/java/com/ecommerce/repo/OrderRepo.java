@@ -17,6 +17,9 @@ public interface OrderRepo extends MongoRepository<Orders, String> {
     
     @Query("{'orderStatus': { $regex: ?0, $options: 'i' }}")
     List<Orders> findByStatus(String status);
+    
+    @Query("{ 'paymentId' : ?0 }")
+	Orders findByPaymentId(String paymentId);
 
     @Query(value = "{ 'userId': ?0, 'orderStatus': ?2, 'cartItems.productId': ?1 }", exists = true)
     Boolean hasUserPurchasedProduct(String userId, String productId, String status);

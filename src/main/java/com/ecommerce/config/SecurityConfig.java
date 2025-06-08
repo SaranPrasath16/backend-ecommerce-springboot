@@ -38,7 +38,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/api/auth/google-login","/api/user/login", "/api/user/register", "/api/user/otp", "/api/homepage","/api/home","/api/payment/order","/api/user/complete-profile","/api/randomproducts").permitAll()
             .requestMatchers("/api/admin/superadmin/**","/api/admin/superadmin/").hasAuthority("ROLE_SUPER_ADMIN")
-            .requestMatchers("/api/user/**", "/api/user/").hasAuthority("ROLE_USER")
+            .requestMatchers("/api/user/**", "/api/user/").hasAnyAuthority("ROLE_USER", "ROLE_SUPER_ADMIN")
             .requestMatchers("/api/admin/productadmin/**","/api/admin/productadmin/").hasAnyAuthority("ROLE_PRODUCT_ADMIN","ROLE_SUPER_ADMIN")
             .requestMatchers("/api/admin/ordersadmin/**","/api/admin/ordersadmin/").hasAnyAuthority("ROLE_ORDERS_ADMIN","ROLE_SUPER_ADMIN")
             .anyRequest().authenticated())
